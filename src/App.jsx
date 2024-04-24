@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +12,10 @@ const App = () => {
   const [ title, setTitle ] = useState('')
   const [ author, setAuthor ] = useState('')
   const [ url, setUrl ] = useState('')
+  const [ notification, setNotification ] = useState({
+    message: null,
+    type: null
+  }) 
   
 
 
@@ -48,7 +53,16 @@ const App = () => {
       setPassword('')
       
     } catch (error) {
-      console.log(error.response.data.error);
+      setNotification({
+        message: `${error.response.data.error}`,
+        type: "error"
+      })
+      setTimeout(() => {
+        setNotification({
+          message: null,
+          type: null
+        })
+      }, 3000)
     }
   }
 
@@ -69,12 +83,25 @@ const App = () => {
       const createdBlog = await blogService.create(newBlog)
       if (createdBlog) {
         setBlogs(blogs.concat(createdBlog))
+        setNotification({
+          message: `a new blog '${createdBlog.title}' by ${createdBlog.author} added!`,
+          type:'info'
+        })
+        setTimeout(() => {
+          setNotification({
+            message:null,
+            type: null
+          })
+        },)
         setTitle('')
         setAuthor('')
         setUrl('')
       }
     } catch (error) {
-      
+      setNotification({
+        message: `${error.response.data.error}`,
+        type:'error'
+      })
     }
   }
 
@@ -86,6 +113,7 @@ const App = () => {
     <div>
 
     <h2>log in to application</h2>
+      <Notification message={notification.message} type={notification.type} />
       <form onSubmit={handleLogin}>
         <div>
           username
@@ -105,6 +133,8 @@ const App = () => {
         <p>{user.name} logged in
          <button type="button" onClick={handleLogout}>logout</button></p>
          <br />
+         <Notification message={notification.message} type={notification.type} />
+
          <br />
          {formCreateNewBlog()}
          <br />
