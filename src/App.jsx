@@ -15,15 +15,17 @@ const App = () => {
   }) 
   
 
-const blogFormRef = useRef()
-
-  useEffect(() => {
+  const blogFormRef = useRef()
+  const getBlogs = () => {
     blogService.getAll().then(blogs =>{
       blogs.sort((a,b) => b.likes - a.likes)
       setBlogs( blogs )
     }
-    )  
-  }, [])
+    )
+  }
+
+
+  useEffect(getBlogs, [])
 
   useEffect(() => {
     const loggedInUser = JSON.parse(window.localStorage.getItem('loggedInUser'))
@@ -90,7 +92,7 @@ const blogFormRef = useRef()
             message:null,
             type: null
           })
-        },)
+        },4000)
 
       }
     } catch (error) {
@@ -105,8 +107,41 @@ const blogFormRef = useRef()
     try {
       const updatedBlog = await blogService.update(id, blog)
       setBlogs(blogs.map(b => b.id !== id ? b: updatedBlog) )
+      getBlogs()
     } catch (error) {
       
+    }
+  }
+
+  const removeBlog = async (blog) => {
+    const confirmed = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
+    if (confirmed) {
+      try {
+        const removedBlog = blogs.find((b) => b.id === blog.id)
+        await blogService.remove(blog.id)
+        getBlogs()
+        setNotification({
+          message: `'${removedBlog.title}' by ${removedBlog.author} removed!`,
+          type:'info'
+        })
+        setTimeout(() => {
+          setNotification({
+            message:null,
+            type: null
+          })
+        },4000)
+      } catch (error) {
+        setNotification({
+          message: `${error.response.data.error}`,
+          type:'error'
+        })
+        setTimeout(() => {
+          setNotification({
+            message:null,
+            type: null
+          })
+        },4000)
+      }
     }
   }
 
@@ -131,7 +166,11 @@ const blogFormRef = useRef()
          <br />
         <h2>blogs</h2>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog}/>
+          <Blog key={blog.id} 
+                blog={blog} 
+                updateBlog={updateBlog}
+                removeBlog={removeBlog}
+          />
         )}
     </div>
   )
