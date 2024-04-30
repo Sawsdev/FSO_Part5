@@ -44,7 +44,7 @@ const Blog = ({ blog, updateBlog }) => {
           <BlogDetail 
             url={blog.url}
             likes={blog.likes}
-            author={blog.author}
+            user={blog.user}
             handleLike={handleBlogLike}
             />
         </div>
