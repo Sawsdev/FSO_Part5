@@ -26,4 +26,8 @@ const update = async ( id, blog ) => {
   return response.data
 }
 
+const remove = async (id) => {
+  
+}
+
 export default { getAll, create, setToken, update }
