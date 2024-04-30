@@ -65,6 +65,11 @@ const blogFormRef = useRef()
     window.localStorage.removeItem('loggedInUser')
     setUser(null)
   }
+
+  /**
+   * Core functionality
+   */
+
   const addBlog = async (newBlog) => {
     
     try {
@@ -94,6 +99,15 @@ const blogFormRef = useRef()
     }
   }
 
+  const updateBlog = async (id, blog) => {
+    try {
+      const updatedBlog = await blogService.update(id, blog)
+      setBlogs(blogs.map(b => b.id !== id ? b: updatedBlog) )
+    } catch (error) {
+      
+    }
+  }
+
   /**
    * Rendering functions
    */
@@ -115,7 +129,7 @@ const blogFormRef = useRef()
          <br />
         <h2>blogs</h2>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog}/>
         )}
     </div>
   )
