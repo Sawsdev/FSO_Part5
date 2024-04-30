@@ -17,10 +17,12 @@ const App = () => {
 
 const blogFormRef = useRef()
 
-  useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+  useEffect(async () => {
+    const allBlogs = await blogService.getAll()
+    allBlogs.sort((a,b) => b.likes - a.likes)
+    setBlogs( allBlogs )
+
+  
   }, [])
 
   useEffect(() => {
