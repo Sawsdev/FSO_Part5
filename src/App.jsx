@@ -12,12 +12,12 @@ const App = () => {
   const [ notification, setNotification ] = useState({
     message: null,
     type: null
-  }) 
-  
+  })
+
 
   const blogFormRef = useRef()
   const getBlogs = () => {
-    blogService.getAll().then(blogs =>{
+    blogService.getAll().then(blogs => {
       blogs.sort((a,b) => b.likes - a.likes)
       setBlogs( blogs )
     }
@@ -34,27 +34,27 @@ const App = () => {
       setUser(loggedInUser)
       blogService.setToken(loggedInUser.token)
     }
-    
+
   }, [])
 
   /**
    * Handlers
    */
-  const handleLogin = async ({username, password}) => {
+  const handleLogin = async ({ username, password }) => {
 
     try {
       const user = await loginService.login({
         username, password
       })
-  
+
       blogService.setToken(user.token)
       window.localStorage.setItem('loggedInUser', JSON.stringify(user))
       setUser(user)
-      
+
     } catch (error) {
       setNotification({
         message: `${error.response.data.error}`,
-        type: "error"
+        type: 'error'
       })
       setTimeout(() => {
         setNotification({
@@ -75,9 +75,9 @@ const App = () => {
    */
 
   const addBlog = async (newBlog) => {
-    
+
     try {
-      
+
       const createdBlog = await blogService.create(newBlog)
       blogFormRef.current.toggleVisibility()
 
@@ -109,7 +109,7 @@ const App = () => {
       setBlogs(blogs.map(b => b.id !== id ? b: updatedBlog) )
       getBlogs()
     } catch (error) {
-      
+
     }
   }
 
@@ -152,36 +152,36 @@ const App = () => {
 
   const blogListArea = () => (
     <div>
-        <p>{user.name} logged in
-         <button type="button" onClick={handleLogout}>logout</button></p>
-         <br />
-         <Notification message={notification.message} type={notification.type} />
+      <p>{user.name} logged in
+        <button type="button" onClick={handleLogout}>logout</button></p>
+      <br />
+      <Notification message={notification.message} type={notification.type} />
 
-         <br />
-         {
-          <Toggable buttonLabel="create blog" ref={blogFormRef}>
-            <CreateBlogForm addBlog={addBlog} /> 
-          </Toggable>
-          }
-         <br />
-        <h2>blogs</h2>
-        {blogs.map(blog =>
-          <Blog key={blog.id} 
-                blog={blog} 
-                updateBlog={updateBlog}
-                removeBlog={removeBlog}
-          />
-        )}
+      <br />
+      {
+        <Toggable buttonLabel="create blog" ref={blogFormRef}>
+          <CreateBlogForm addBlog={addBlog} />
+        </Toggable>
+      }
+      <br />
+      <h2>blogs</h2>
+      {blogs.map(blog =>
+        <Blog key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+          removeBlog={removeBlog}
+        />
+      )}
     </div>
   )
 
   return (
     <div>
-      {user === null 
+      {user === null
         ? <Login logIn={handleLogin} notification={notification} />
         : blogListArea()
       }
-      
+
     </div>
   )
 }
